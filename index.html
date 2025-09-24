@@ -4,60 +4,100 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DeepKO — Retro Ana Sayfa</title>
-<meta name="description" content="Windows93 esintili retro ana sayfa.">
+<meta name="description" content="Windows93 esintili retro ana sayfa — siyah arka plan & boot efekti.">
+<link rel="canonical" href="https://deepko.org">
 <link rel="icon" href="/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#0b1930;--bg2:#0f2542;--line:#1e3552;--glass:rgba(255,255,255,.06);
-    --ink:#e9f4ff;--accent:#00fff0;--accent2:#7ce8ff;
+    --ink:#e9f4ff; --line:#1e3552; --glass:rgba(255,255,255,.06);
+    --accent:#00fff0; --accent2:#7ce8ff;
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;color:var(--ink);font-family:Outfit,system-ui,Segoe UI,Roboto,Arial;
-    background:radial-gradient(900px 600px at 10% -10%,rgba(0,255,240,.07),transparent 60%),
-               radial-gradient(900px 600px at 110% 0,rgba(124,232,255,.06),transparent 60%),
-               linear-gradient(180deg,var(--bg1),var(--bg2) 55%,#091324);}
-  /* grain */
-  .grain{position:fixed;inset:0;pointer-events:none;opacity:.08;z-index:0;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.7'/></svg>");}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    font-family:Outfit,system-ui,Segoe UI,Roboto,Arial;
+    background:#000; /* ← tam siyah arka plan */
+  }
 
-  /* Desktop grid */
-  #desktop{position:fixed;inset:0;display:grid;grid-template-columns:repeat(auto-fill,96px);
-    align-content:start;gap:10px;padding:16px 16px 72px;z-index:1}
-  .icon{width:96px;display:flex;flex-direction:column;align-items:center;gap:8px;
-    text-align:center;user-select:none;border:1px solid transparent;border-radius:10px;padding:8px;cursor:pointer}
-  .icon:hover{background:rgba(255,255,255,.06);border-color:var(--line)}
-  .icon img{width:42px;height:42px;image-rendering:pixelated;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
-  .icon span{font-family:VT323,monospace;font-size:18px;text-shadow:0 0 6px #0008}
+  /* ====== BOOT OVERLAY (siyah ekran + yeşil yazı) ====== */
+  #boot{
+    position:fixed; inset:0; z-index:9999;
+    background:#000; color:#00ff9c;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"VT323", monospace; transition:opacity .6s ease;
+  }
+  #boot.hidden{opacity:0; pointer-events:none}
+  #boot .inner{width:min(90vw,860px); padding:24px}
+  #bootlog{white-space:pre-wrap; line-height:1.3; font-size:20px}
+  #boot .cursor{display:inline-block; width:10px; height:1.1em; background:#00ff9c; margin-left:3px; animation:blink 1s steps(1) infinite; vertical-align:-0.2em}
+  @keyframes blink{50%{opacity:0}}
+  #skip{position:absolute; right:14px; bottom:10px; font-size:13px; color:#7affc9; opacity:.65; cursor:pointer}
+  #skip:hover{opacity:1; text-decoration:underline}
 
-  /* Taskbar */
-  #taskbar{position:fixed;left:0;right:0;bottom:0;height:50px;background:rgba(10,23,38,.8);
-    backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:8px 10px;z-index:2}
-  #start{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#1b4b78,#103254);
-    color:#fff;border:1px solid #2d5a86;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+  /* ====== DESKTOP ====== */
+  #desktop{
+    position:fixed; inset:0; z-index:1;
+    display:grid; grid-template-columns:repeat(auto-fill,96px);
+    align-content:start; gap:10px; padding:16px 16px 72px;
+  }
+  .icon{
+    width:96px; display:flex; flex-direction:column; align-items:center; gap:8px;
+    text-align:center; user-select:none; border:1px solid transparent; border-radius:10px; padding:8px; cursor:pointer;
+  }
+  .icon:hover{background:rgba(255,255,255,.06); border-color:var(--line)}
+  .icon img{width:42px; height:42px; image-rendering:pixelated; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+  .icon span{font-family:VT323,monospace; font-size:18px; text-shadow:0 0 6px #0008}
+
+  .brand{
+    position:fixed; top:14px; right:16px; z-index:2;
+    font-family:VT323,monospace; font-size:22px; color:var(--accent); text-shadow:0 0 10px var(--accent)
+  }
+
+  /* ====== TASKBAR ====== */
+  #taskbar{
+    position:fixed; left:0; right:0; bottom:0; height:50px; z-index:3;
+    background:rgba(10,23,38,.75); backdrop-filter:blur(8px);
+    border-top:1px solid var(--line); display:flex; align-items:center; gap:10px; padding:8px 10px;
+  }
+  #start{
+    display:flex; align-items:center; gap:8px; cursor:pointer;
+    background:linear-gradient(180deg,#1b4b78,#103254); color:#fff;
+    border:1px solid #2d5a86; border-radius:10px; padding:8px 12px; font-weight:700;
+  }
   #start:hover{filter:brightness(1.08)}
-  #clock{margin-left:auto;font-family:VT323,monospace;font-size:22px;opacity:.85}
+  .badge{padding:5px 10px; border:1px solid var(--line); background:var(--glass); border-radius:999px; font-size:12px}
+  #clock{margin-left:auto; font-family:VT323,monospace; font-size:22px; opacity:.85}
 
-  /* Start menu */
-  #menu{position:fixed;left:10px;bottom:60px;width:280px;background:rgba(8,20,36,.96);
-    border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 28px rgba(0,0,0,.55);display:none;z-index:3}
+  /* ====== START MENU ====== */
+  #menu{
+    position:fixed; left:10px; bottom:60px; width:280px; z-index:4;
+    background:rgba(8,20,36,.96); border:1px solid var(--line); border-radius:14px; box-shadow:0 14px 28px rgba(0,0,0,.55);
+    display:none;
+  }
   #menu.show{display:block}
-  .menu-item{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #1a3552}
+  .menu-item{display:flex; align-items:center; gap:10px; padding:12px; border-bottom:1px solid #1a3552}
   .menu-item:last-child{border-bottom:0}
-  .menu-item a{color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;width:100%}
+  .menu-item a{color:var(--ink); text-decoration:none; display:flex; align-items:center; gap:10px; width:100%}
   .menu-item:hover{background:rgba(255,255,255,.06)}
-  .menu-item img{width:18px;height:18px}
-  .badge{padding:5px 10px;border:1px solid var(--line);background:var(--glass);border-radius:999px;font-size:12px;margin-left:8px}
-  .brand{position:fixed;top:14px;right:16px;font-family:VT323,monospace;font-size:22px;color:var(--accent);text-shadow:0 0 10px var(--accent)}
+  .menu-item img{width:18px; height:18px}
 </style>
 </head>
 <body>
-<div class="grain"></div>
 
-<!-- small brand -->
+<!-- ====== BOOT OVERLAY ====== -->
+<div id="boot">
+  <div class="inner">
+    <div id="bootlog"></div>
+    <div id="skip">Geçmek için tıkla</div>
+  </div>
+</div>
+
+<!-- ====== BRAND ====== -->
 <div class="brand">DeepKO OS</div>
 
-<!-- Desktop icons (sadece link veriyor) -->
+<!-- ====== DESKTOP ICONS (sadece link) ====== -->
 <div id="desktop">
   <a class="icon" href="/download">
     <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%2300fff0'/><path d='M32 16v22M22 30l10 10 10-10' stroke='%23001619' stroke-width='3' stroke-linecap='round' fill='none'/></svg>">
@@ -89,41 +129,15 @@
   </a>
 </div>
 
-<!-- Taskbar -->
+<!-- ====== TASKBAR ====== -->
 <div id="taskbar">
   <div id="start">★ Başlat</div>
   <div class="badge">DeepKO v0.1</div>
   <div id="clock">00:00</div>
 </div>
 
-<!-- Start menu (ikonlarla aynı linkler) -->
+<!-- ====== START MENU ====== -->
 <div id="menu">
   <div class="menu-item"><a href="/download"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><path d='M9 2v7M5 8l4 4 4-4' stroke='%2300fff0' stroke-width='2' fill='none'/></svg>"> Client İndir</a></div>
   <div class="menu-item"><a href="/register"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='9' cy='6' r='3' fill='%23fff'/><rect x='5' y='10' width='8' height='5' rx='3' fill='%23fff'/></svg>"> Kayıt Ol</a></div>
-  <div class="menu-item"><a href="/login"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><path d='M10 3h6v12h-6zM2 9h7M7 6l3 3-3 3' stroke='%23fff' stroke-width='2' fill='none'/></svg>"> Giriş Yap</a></div>
-  <div class="menu-item"><a href="/rankings"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><rect x='3' y='9' width='3' height='6' fill='%23fff'/><rect x='8' y='6' width='3' height='9' fill='%23fff'/><rect x='13' y='8' width='3' height='7' fill='%23fff'/></svg>"> Sıralama</a></div>
-  <div class="menu-item"><a href="/status"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='6' cy='9' r='3' fill='%23ff5252'/><circle cx='9' cy='9' r='3' fill='%23ffd166'/><circle cx='12' cy='9' r='3' fill='%2327e29d'/></svg>"> Durum</a></div>
-  <div class="menu-item"><a href="https://discord.gg/" target="_blank" rel="noopener"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='6' cy='9' r='2' fill='white'/><circle cx='12' cy='9' r='2' fill='white'/></svg>"> Discord</a></div>
-</div>
-
-<script>
-  // Saat
-  function clock(){const d=new Date(),p=n=>String(n).padStart(2,'0');document.getElementById('clock').textContent=p(d.getHours())+":"+p(d.getMinutes());}
-  clock(); setInterval(clock,1000);
-
-  // Başlat menüsü
-  const start=document.getElementById('start'), menu=document.getElementById('menu');
-  start.onclick=()=>menu.classList.toggle('show');
-  document.addEventListener('click',e=>{ if(!menu.contains(e.target) && e.target!==start) menu.classList.remove('show'); });
-
-  // Masaüstünde tek tık/dblclick ile linke gitme
-  document.querySelectorAll('.icon').forEach(el=>{
-    let t; el.addEventListener('click',e=>{ // tek tık
-      clearTimeout(t); t=setTimeout(()=>{ window.location.href=el.getAttribute('href'); }, 200);
-      e.preventDefault();
-    });
-    el.addEventListener('dblclick',e=>{ clearTimeout(t); window.location.href=el.getAttribute('href'); e.preventDefault(); });
-  });
-</script>
-</body>
-</html>
+  <div class="menu-item"><a href="/login"><img src="data:i
