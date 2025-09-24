@@ -3,313 +3,127 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DeepKO OS — Retro Panel</title>
-<meta name="description" content="Windows93 esintili retro masaüstü arayüzü: pencereler, görev çubuğu, uygulamalar.">
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+<title>DeepKO — Retro Ana Sayfa</title>
+<meta name="description" content="Windows93 esintili retro ana sayfa.">
 <link rel="icon" href="/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg1:#0b1930;--bg2:#0f2542;--line:#1e3552;--glass:rgba(255,255,255,.06);
-    --ink:#e9f4ff;--accent:#00fff0;--accent2:#7ce8ff;--win:#0f223b;--title:#123055;
+    --ink:#e9f4ff;--accent:#00fff0;--accent2:#7ce8ff;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;color:var(--ink);background:
-    radial-gradient(900px 600px at 10% -10%,rgba(0,255,240,.07),transparent 60%),
-    radial-gradient(900px 600px at 110% 0,rgba(124,232,255,.06),transparent 60%),
-    linear-gradient(180deg,var(--bg1),var(--bg2) 55%,#091324);
-    font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-  /* subtle grain */
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;color:var(--ink);font-family:Outfit,system-ui,Segoe UI,Roboto,Arial;
+    background:radial-gradient(900px 600px at 10% -10%,rgba(0,255,240,.07),transparent 60%),
+               radial-gradient(900px 600px at 110% 0,rgba(124,232,255,.06),transparent 60%),
+               linear-gradient(180deg,var(--bg1),var(--bg2) 55%,#091324);}
+  /* grain */
   .grain{position:fixed;inset:0;pointer-events:none;opacity:.08;z-index:0;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.7'/></svg>");
-  }
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.7'/></svg>");}
 
-  /* Desktop */
-  #desktop{position:fixed;inset:0;display:grid;grid-template-columns:repeat(auto-fill,90px);
-    align-content:start;gap:8px;padding:14px 14px 64px;z-index:1}
-  .icon{width:90px;display:flex;flex-direction:column;align-items:center;gap:6px;
-    user-select:none;cursor:default;border:1px solid transparent;padding:6px;border-radius:8px}
+  /* Desktop grid */
+  #desktop{position:fixed;inset:0;display:grid;grid-template-columns:repeat(auto-fill,96px);
+    align-content:start;gap:10px;padding:16px 16px 72px;z-index:1}
+  .icon{width:96px;display:flex;flex-direction:column;align-items:center;gap:8px;
+    text-align:center;user-select:none;border:1px solid transparent;border-radius:10px;padding:8px;cursor:pointer}
   .icon:hover{background:rgba(255,255,255,.06);border-color:var(--line)}
-  .icon img{width:38px;height:38px;image-rendering:pixelated;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
-  .icon span{font-family:VT323,monospace;font-size:18px;text-align:center;text-shadow:0 0 6px #0008}
-
-  /* Window */
-  .win{position:absolute;min-width:280px;min-height:160px;background:var(--win);
-    border:1px solid #2a4666;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:2;overflow:hidden}
-  .win.hidden{display:none}
-  .titlebar{display:flex;align-items:center;justify-content:space-between;gap:8px;
-    background:linear-gradient(#173a67,#0f2d52);color:#dff6ff;padding:8px 10px;border-bottom:1px solid #244a73;cursor:grab}
-  .titlebar:active{cursor:grabbing}
-  .titlebar .title{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.2px}
-  .titlebar .btns{display:flex;gap:6px}
-  .btn{width:22px;height:22px;border:1px solid #39638b;border-radius:4px;background:#17446c;
-    display:grid;place-items:center;cursor:pointer}
-  .btn:hover{filter:brightness(1.15)}
-  .close{background:#7b1b2a;border-color:#a33} .close:hover{filter:brightness(1.1)}
-  .content{padding:10px;background:rgba(0,0,0,.15);height:calc(100% - 40px);overflow:auto}
-
-  .resize{position:absolute;width:16px;height:16px;right:0;bottom:0;cursor:nwse-resize;
-    background:linear-gradient(135deg,transparent 50%,#2e5176 0) content-box;padding:6px}
-  .max{position:fixed;inset:0;margin:0;border-radius:0}
+  .icon img{width:42px;height:42px;image-rendering:pixelated;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+  .icon span{font-family:VT323,monospace;font-size:18px;text-shadow:0 0 6px #0008}
 
   /* Taskbar */
-  #taskbar{position:fixed;left:0;right:0;bottom:0;height:44px;background:rgba(10,23,38,.8);
-    backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:6px 10px;z-index:3}
+  #taskbar{position:fixed;left:0;right:0;bottom:0;height:50px;background:rgba(10,23,38,.8);
+    backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:8px 10px;z-index:2}
   #start{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#1b4b78,#103254);
-    color:#fff;border:1px solid #2d5a86;border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer}
+    color:#fff;border:1px solid #2d5a86;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
   #start:hover{filter:brightness(1.08)}
-  #tasks{display:flex;gap:8px;flex:1}
-  .task{min-width:120px;background:var(--glass);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
-  .task.active{outline:2px solid var(--accent)}
-  #clock{font-family:VT323,monospace;font-size:22px;opacity:.85}
+  #clock{margin-left:auto;font-family:VT323,monospace;font-size:22px;opacity:.85}
 
   /* Start menu */
-  #menu{position:fixed;left:6px;bottom:54px;width:260px;background:rgba(8,20,36,.96);
-    border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 28px rgba(0,0,0,.55);display:none;z-index:4}
+  #menu{position:fixed;left:10px;bottom:60px;width:280px;background:rgba(8,20,36,.96);
+    border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 28px rgba(0,0,0,.55);display:none;z-index:3}
   #menu.show{display:block}
-  .menu-item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #1a3552;cursor:pointer}
+  .menu-item{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #1a3552}
   .menu-item:last-child{border-bottom:0}
+  .menu-item a{color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;width:100%}
   .menu-item:hover{background:rgba(255,255,255,.06)}
   .menu-item img{width:18px;height:18px}
-
-  /* Apps */
-  .notepad{white-space:pre-wrap;outline:none;background:#0b1a2c;border:1px dashed #2b4f74;border-radius:8px;padding:10px;font-family:VT323,monospace;font-size:20px}
-  .about{line-height:1.6}
-  .list{list-style:none;padding-left:0;margin:10px 0}
-  .list li{padding:6px 8px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,.03)}
-  .center{text-align:center}
-  .accent{color:var(--accent)}
-  .link{color:var(--accent);text-decoration:none}
+  .badge{padding:5px 10px;border:1px solid var(--line);background:var(--glass);border-radius:999px;font-size:12px;margin-left:8px}
+  .brand{position:fixed;top:14px;right:16px;font-family:VT323,monospace;font-size:22px;color:var(--accent);text-shadow:0 0 10px var(--accent)}
 </style>
 </head>
 <body>
 <div class="grain"></div>
 
-<!-- Desktop with icons -->
+<!-- small brand -->
+<div class="brand">DeepKO OS</div>
+
+<!-- Desktop icons (sadece link veriyor) -->
 <div id="desktop">
-  <div class="icon" data-app="about">
-    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%2300fff0'/><text x='50%' y='56%' dominant-baseline='middle' text-anchor='middle' font-family='Verdana' font-size='34' fill='%23001619'>i</text></svg>">
-    <span>Hakkında</span>
-  </div>
-  <div class="icon" data-app="notepad">
-    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%237ce8ff'/><path d='M18 20h28M18 30h28M18 40h22' stroke='%23001619' stroke-width='3' stroke-linecap='round'/></svg>">
-    <span>Not Defteri</span>
-  </div>
-  <div class="icon" data-app="player">
-    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%2329c1c1'/><polygon points='25,20 46,32 25,44' fill='white'/></svg>">
-    <span>Radyo</span>
-  </div>
-  <div class="icon" data-app="browser">
-    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%232e7be5'/><circle cx='32' cy='32' r='12' fill='white'/></svg>">
-    <span>Tarayıcı</span>
-  </div>
-  <div class="icon" data-app="rank">
+  <a class="icon" href="/download">
+    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%2300fff0'/><path d='M32 16v22M22 30l10 10 10-10' stroke='%23001619' stroke-width='3' stroke-linecap='round' fill='none'/></svg>">
+    <span>Client İndir</span>
+  </a>
+  <a class="icon" href="/register">
+    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%237ce8ff'/><circle cx='32' cy='26' r='10' fill='white'/><rect x='18' y='38' width='28' height='12' rx='6' fill='white'/></svg>">
+    <span>Kayıt Ol</span>
+  </a>
+  <a class="icon" href="/login">
+    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%2329c1c1'/><path d='M36 20h8v24h-8zM20 32h14M28 26l6 6-6 6' stroke='white' stroke-width='3' stroke-linecap='round' fill='none'/></svg>">
+    <span>Giriş Yap</span>
+  </a>
+  <a class="icon" href="/rankings">
     <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%2360d394'/><path d='M18 44V30M32 44V22M46 44V34' stroke='white' stroke-width='4' stroke-linecap='round'/></svg>">
     <span>Sıralama</span>
-  </div>
-  <div class="icon" data-app="trash">
-    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%23a1b3c9'/><rect x='20' y='20' width='24' height='24' fill='white'/></svg>">
-    <span>Çöp</span>
-  </div>
+  </a>
+  <a class="icon" href="/status">
+    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%23a1b3c9'/><circle cx='20' cy='32' r='6' fill='%23ff5252'/><circle cx='32' cy='32' r='6' fill='%23ffd166'/><circle cx='44' cy='32' r='6' fill='%2327e29d'/></svg>">
+    <span>Durum</span>
+  </a>
+  <a class="icon" href="https://discord.gg/" target="_blank" rel="noopener">
+    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%232e7be5'/><circle cx='26' cy='32' r='4' fill='white'/><circle cx='38' cy='32' r='4' fill='white'/></svg>">
+    <span>Discord</span>
+  </a>
+  <a class="icon" href="/about">
+    <img alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='10' ry='10' width='64' height='64' fill='%23ffc857'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' font-family='Verdana' font-size='34' fill='%23001619'>i</text></svg>">
+    <span>Hakkında</span>
+  </a>
 </div>
 
 <!-- Taskbar -->
 <div id="taskbar">
   <div id="start">★ Başlat</div>
-  <div id="tasks"></div>
+  <div class="badge">DeepKO v0.1</div>
   <div id="clock">00:00</div>
 </div>
 
-<!-- Start menu -->
+<!-- Start menu (ikonlarla aynı linkler) -->
 <div id="menu">
-  <div class="menu-item" data-app="about"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='9' cy='9' r='8' fill='%2300fff0'/></svg>"> Hakkında</div>
-  <div class="menu-item" data-app="notepad"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><rect width='18' height='18' fill='%237ce8ff'/></svg>"> Not Defteri</div>
-  <div class="menu-item" data-app="player"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><polygon points='6,4 14,9 6,14' fill='white'/></svg>"> Radyo</div>
-  <div class="menu-item" data-app="browser"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='9' cy='9' r='8' fill='%232e7be5'/></svg>"> DeepKO.org</div>
-  <div class="menu-item" data-app="rank"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><rect x='3' y='8' width='3' height='7' fill='white'/><rect x='8' y='5' width='3' height='10' fill='white'/><rect x='13' y='7' width='3' height='8' fill='white'/></svg>"> Sıralama</div>
-  <div class="menu-item" id="shutdown"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='9' cy='9' r='8' stroke='red' stroke-width='2' fill='none'/><line x1='9' y1='3' x2='9' y2='9' stroke='red' stroke-width='2'/></svg>"> Kapat
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DeepKO — Retro Panel</title>
-  <meta name="description" content="DeepKO PVP kontrol paneli. Kayıt, giriş, indir ve durum." />
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="canonical" href="https://deepko.org" />
-  <!-- Retro/mono + pixel font -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=VT323&display=swap" rel="stylesheet">
-  <style>
-    /* ---- Reset & vars ---- */
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:#0a1522;color:#e6f2ff;font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    a{color:inherit;text-decoration:none}
-    :root{
-      --bg-1:#0b1524; --bg-2:#0d1f33; --bg-3:#0a1a2b;
-      --accent:#00fff0; --accent-2:#77e1ff; --ink:#eaf7ff;
-      --glass:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
-      --shadow:0 10px 30px rgba(0,0,0,.35);
-    }
+  <div class="menu-item"><a href="/download"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><path d='M9 2v7M5 8l4 4 4-4' stroke='%2300fff0' stroke-width='2' fill='none'/></svg>"> Client İndir</a></div>
+  <div class="menu-item"><a href="/register"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='9' cy='6' r='3' fill='%23fff'/><rect x='5' y='10' width='8' height='5' rx='3' fill='%23fff'/></svg>"> Kayıt Ol</a></div>
+  <div class="menu-item"><a href="/login"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><path d='M10 3h6v12h-6zM2 9h7M7 6l3 3-3 3' stroke='%23fff' stroke-width='2' fill='none'/></svg>"> Giriş Yap</a></div>
+  <div class="menu-item"><a href="/rankings"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><rect x='3' y='9' width='3' height='6' fill='%23fff'/><rect x='8' y='6' width='3' height='9' fill='%23fff'/><rect x='13' y='8' width='3' height='7' fill='%23fff'/></svg>"> Sıralama</a></div>
+  <div class="menu-item"><a href="/status"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='6' cy='9' r='3' fill='%23ff5252'/><circle cx='9' cy='9' r='3' fill='%23ffd166'/><circle cx='12' cy='9' r='3' fill='%2327e29d'/></svg>"> Durum</a></div>
+  <div class="menu-item"><a href="https://discord.gg/" target="_blank" rel="noopener"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='6' cy='9' r='2' fill='white'/><circle cx='12' cy='9' r='2' fill='white'/></svg>"> Discord</a></div>
+</div>
 
-    /* ---- Background (gradient + grain) ---- */
-    .bg{
-      position:fixed; inset:0; z-index:-2;
-      background: radial-gradient(1200px 600px at 20% -10%, #14395b55, transparent 60%),
-                  radial-gradient(1000px 800px at 120% 10%, #0aa7a855, transparent 60%),
-                  linear-gradient(180deg, var(--bg-1), var(--bg-2) 50%, var(--bg-3));
-    }
-    .grain{
-      position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.12;
-      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.55'/></svg>");
-    }
+<script>
+  // Saat
+  function clock(){const d=new Date(),p=n=>String(n).padStart(2,'0');document.getElementById('clock').textContent=p(d.getHours())+":"+p(d.getMinutes());}
+  clock(); setInterval(clock,1000);
 
-    /* ---- Layout ---- */
-    .wrap{max-width:1080px; margin:0 auto; padding:0 20px}
-    header.nav{
-      position:sticky; top:0; z-index:30;
-      backdrop-filter: blur(8px);
-      background:linear-gradient(to bottom, rgba(10,21,34,.75), rgba(10,21,34,.35));
-      border-bottom:1px solid var(--line);
-    }
-    .nav-in{display:flex; align-items:center; justify-content:space-between; padding:12px 0}
-    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.5px}
-    .dot{width:10px; height:10px; border-radius:999px; background:#27e29d; box-shadow:0 0 12px #27e29d}
-    .menu{display:flex; gap:20px; font-weight:600; font-size:14px}
-    .menu a{opacity:.85} .menu a:hover{opacity:1; color:var(--accent)}
+  // Başlat menüsü
+  const start=document.getElementById('start'), menu=document.getElementById('menu');
+  start.onclick=()=>menu.classList.toggle('show');
+  document.addEventListener('click',e=>{ if(!menu.contains(e.target) && e.target!==start) menu.classList.remove('show'); });
 
-    /* ---- Hero ---- */
-    .hero{padding:92px 0 64px; text-align:center}
-    .title{
-      font-family:VT323, monospace; font-size:64px; line-height:1;
-      color:var(--accent); text-shadow:0 0 14px #03ffd9, 0 0 28px #009e96;
-      margin:0 0 12px;
-    }
-    .subtitle{opacity:.85; max-width:760px; margin:0 auto 26px; font-size:18px}
-    .cta{display:flex; gap:14px; justify-content:center; flex-wrap:wrap}
-    .btn{
-      display:inline-block; padding:12px 20px; border-radius:12px;
-      background:var(--glass); border:1px solid var(--line); color:var(--ink);
-      box-shadow:var(--shadow); transition:.2s transform, .2s background;
-      font-weight:700; letter-spacing:.2px
-    }
-    .btn:hover{transform:translateY(-2px); background:rgba(255,255,255,.12)}
-    .btn.primary{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#001619; border:none}
-    .btn.primary:hover{filter:brightness(1.05)}
-
-    /* ---- Sections ---- */
-    section{padding:36px 0}
-    .cards{display:grid; grid-template-columns:1fr; gap:16px}
-    @media (min-width:760px){.cards{grid-template-columns:repeat(3,1fr)}}
-    .card{
-      background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:18px;
-      box-shadow:var(--shadow)
-    }
-    .card h3{margin:6px 0 10px}
-    .stat{display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center}
-    .pill{padding:6px 10px; border:1px solid var(--line); background:rgba(255,255,255,.04); border-radius:999px; font-size:13px}
-
-    /* ---- Footer ---- */
-    footer{border-top:1px solid var(--line); padding:28px 0; opacity:.8; text-align:center; font-size:14px}
-
-    /* Small niceties */
-    .blink{animation:blink 1.4s infinite}
-    @keyframes blink{50%{opacity:.35}}
-    .playing{width:8px; height:22px; background:var(--accent); border-radius:6px; animation:bar 1s infinite ease-in-out}
-    .playing:nth-child(2){animation-delay:.15s}
-    .playing:nth-child(3){animation-delay:.3s}
-    @keyframes bar{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
-  </style>
-</head>
-<body>
-  <div class="bg"></div>
-  <div class="grain"></div>
-
-  <!-- NAV -->
-  <header class="nav">
-    <div class="wrap nav-in">
-      <div class="brand"><span class="dot blink"></span> DeepKO Panel</div>
-      <nav class="menu">
-        <a href="#status">Durum</a>
-        <a href="#download">İndir</a>
-        <a href="#register">Kayıt</a>
-        <a href="#support">Destek</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="wrap">
-      <h1 class="title">DEEP<span style="color:#77e1ff">KO</span> çalışıyor</h1>
-      <p class="subtitle">Poolsuite esintili hafif, hızlı bir <b>KO PVP panel</b>. Giriş yap, kayıt ol, client indir ve canlı durumu gör.</p>
-      <div class="cta">
-        <a class="btn primary" href="#register">Kayıt Ol</a>
-        <a class="btn" href="#login">Giriş Yap</a>
-        <a class="btn" href="#download">Client İndir</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- STATUS -->
-  <section id="status">
-    <div class="wrap">
-      <div class="cards">
-        <div class="card">
-          <h3>Sunucu Durumu</h3>
-          <div class="stat">
-            <div class="playing"></div><div class="playing"></div><div class="playing"></div>
-            <div class="pill" style="margin-left:8px">Online • Ping: <span id="ping">38</span> ms</div>
-          </div>
-          <p style="opacity:.8">Canlı veri için API bağlayacağız. Şimdilik örnek değer gösteriliyor.</p>
-        </div>
-        <div class="card">
-          <h3>Oyuncu</h3>
-          <div class="pill">Anlık: <b id="players">382</b></div>
-          <div class="pill" style="margin-top:8px">Zirve: <b id="peak">1257</b></div>
-        </div>
-        <div class="card" id="download">
-          <h3>Client İndir</h3>
-          <p>Kurulum paketini tek tık indir.</p>
-          <a class="btn primary" href="#" download>İndir (.exe)</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REGISTER / LOGIN placeholders -->
-  <section id="register">
-    <div class="wrap">
-      <div class="card">
-        <h3>Kayıt / Giriş</h3>
-        <p>Bu alanı KO veritabanına bağlanacak küçük bir <b>VPS API</b> ile aktif edeceğiz (Discord/Email doğrulama, anti-abuse vb.).</p>
-        <div class="cta">
-          <a class="btn" href="#login">Giriş</a>
-          <a class="btn primary" href="#">Kayıt</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SUPPORT -->
-  <section id="support">
-    <div class="wrap">
-      <div class="card">
-        <h3>Destek</h3>
-        <p>Discord linkini buraya ekleyebilirsin: <a href="#" style="color:var(--accent)">discord.gg/…</a></p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="wrap">© <span id="y"></span> DeepKO • Tüm hakları saklıdır.</div>
-  </footer>
-
-  <script>
-    // Küçük kalite dokunuşları
-    document.getElementById("y").textContent = new Date().getFullYear();
-    // İleride gerçek API bağlayınca aşağıyı örnek olarak kullanırız:
-    // fetch('/api/status').then(r=>r.json()).then(s=>{ ...update DOM... })
-  </script>
+  // Masaüstünde tek tık/dblclick ile linke gitme
+  document.querySelectorAll('.icon').forEach(el=>{
+    let t; el.addEventListener('click',e=>{ // tek tık
+      clearTimeout(t); t=setTimeout(()=>{ window.location.href=el.getAttribute('href'); }, 200);
+      e.preventDefault();
+    });
+    el.addEventListener('dblclick',e=>{ clearTimeout(t); window.location.href=el.getAttribute('href'); e.preventDefault(); });
+  });
+</script>
 </body>
 </html>
