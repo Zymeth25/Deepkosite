@@ -1,62 +1,93 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Splash Screen</title>
-<style>
-  body {
-    background: #000;
-    color: #7dff7d;
-    font-family: Consolas, monospace;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  .log {
-    position: relative;
-    width: 600px;
-    height: 24px; /* tek satır için */
-    overflow: hidden;
-  }
-  .log-line {
-    position: absolute;
-    opacity: 0;
-    animation: fadeInOut 1s linear forwards;
-  }
-  @keyframes fadeInOut {
-    0%   { opacity: 0; transform: translateY(100%); }
-    10%  { opacity: 1; transform: translateY(0); }
-    90%  { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-100%); }
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeepKo Official Page</title>
+  <style>
+    :root { --boot-duration: 2500ms; }                /* splash toplam süre: 2.5 sn */
+    html, body { height: 100%; margin: 0; }
+    body { background: #000; color: #cfcfcf; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    /* Tam ekran splash (çerçevesiz) */
+    .splash { position: fixed; inset: 0; background: #000; z-index: 9999; }
+
+    /* Sol üstte, satırlar sırayla belirsin */
+    .splash-log {
+      position: absolute; top: 20px; left: 20px; right: 20px;
+      max-height: 90vh; overflow: hidden;
+      font-size: 14px; line-height: 1.35; color: #7dff7d;
+      white-space: pre-wrap;
+    }
+    .log-line {
+      opacity: 0; transform: translateY(6px);
+      animation: showLine 0.25s ease forwards;        /* her satır kısaca beliriyor */
+    }
+    @keyframes showLine { to { opacity: 1; transform: translateY(0); } }
+
+    /* Yanıp sönen blok imleç (opsiyonel) */
+    .blink { display:inline-block; width:8px; margin-left:4px; animation: blink 900ms steps(1,end) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Ana içerik splash bitene kadar gizli */
+    .app { opacity:0; visibility:hidden; transition: opacity .3s ease; min-height:100vh; display:grid; place-items:center; }
+    .app.is-ready { opacity:1; visibility:visible; }
+  </style>
 </head>
 <body>
-  <div class="log">
-    <div class="log-line" style="animation-delay: 0s">System requirements loading... (Please insert potato to continue)</div>
-    <div class="log-line" style="animation-delay: 1s">Loading as it loads... (∞ progress bar vibes)</div>
-    <div class="log-line" style="animation-delay: 2s">Almost there... (but not really)</div>
-    <div class="log-line" style="animation-delay: 3s">It’s about to be full... (99% forever club)</div>
-    <div class="log-line" style="animation-delay: 4s">We are all part of the show... (No refunds)</div>
-    <div class="log-line" style="animation-delay: 5s">Only stole 2 seconds of your life :S (trust me bro)</div>
-    <div class="log-line" style="animation-delay: 6s">Everything was better in 2006 xD (Bring back MSN Messenger!)</div>
-    <div class="log-line" style="animation-delay: 7s">System is starting... (Cross your fingers)</div>
-    <div class="log-line" style="animation-delay: 8s">Knight Online Hayaf Offline 🚬🚬🚬 (Server in vacation mode)</div>
-    <div class="log-line" style="animation-delay: 9s">Sistem gereksinimleri yükleniyor...</div>
-    <div class="log-line" style="animation-delay: 10s">Yüklendikçe yükleniyor</div>
-    <div class="log-line" style="animation-delay: 11s">Ha gayet çok az kaldı...</div>
-    <div class="log-line" style="animation-delay: 12s">Aha doldu dolcak...</div>
-    <div class="log-line" style="animation-delay: 13s">Hepimiz şovun bir parçasıyız...</div>
-    <div class="log-line" style="animation-delay: 14s">Sadece 2 saniyeni aldım :S...</div>
-    <div class="log-line" style="animation-delay: 15s">Herşey 2006 yılında çok güzeldi sanki xD...</div>
-    <div class="log-line" style="animation-delay: 16s">Sistem başlatılıyor...</div>
-    <div class="log-line" style="animation-delay: 17s">Knight Online Hayaf Offline 🚬🚬🚬</div>
-    <div class="log-line" style="animation-delay: 18s">Hazır█ █ █</div>
-    <div class="log-line" style="animation-delay: 19s">11%</div>
-  
-<style>
+
+  <!-- SPLASH -->
+  <div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
+    <div class="splash-log">
+      <div class="log-line">System requirements loading... (Please insert potato to continue)</div>
+      <div class="log-line">Loading as it loads... (∞ progress bar vibes)</div>
+      <div class="log-line">Almost there... (but not really)</div>
+      <div class="log-line">It’s about to be full... (99% forever club)</div>
+      <div class="log-line">We are all part of the show... (No refunds)</div>
+      <div class="log-line">Only stole 2.5 seconds of your life :S (trust me bro)</div>
+      <div class="log-line">Everything was better in 2006 xD (Bring back MSN Messenger!)</div>
+      <div class="log-line">System is starting... (Cross your fingers)</div>
+      <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
+      <div class="log-line">Yüklendikçe yükleniyor…</div>
+      <div class="log-line">Ha gayret, çok az kaldı…</div>
+      <div class="log-line">Aha doldu dolacak…</div>
+      <div class="log-line">Hepimiz şovun bir parçasıyız…</div>
+      <div class="log-line">Sadece 2.5 saniyeni aldım :S…</div>
+      <div class="log-line">Her şey 2006’da daha güzeldi xD…</div>
+      <div class="log-line">Sistem başlatılıyor…</div>
+      <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
+      <div class="log-line">Hazır<span class="blink">█ █ █</span></div>
+    </div>
+  </div>
+
+  <!-- ANA SAYFA (yer tutucu) -->
+  <main class="app" id="app">
+    <h1 style="color:#d9d9d9;font-weight:600">DeepKo — Ana Sayfa</h1>
+  </main>
+
+  <script>
+    // 1) Satırları sırayla akıt (üstten alta)
+    document.addEventListener('DOMContentLoaded', () => {
+      const lines = document.querySelectorAll('.log-line');
+      const DELAY_MS = 120; // satırlar arası hız (daha hızlı için 90-100 yap)
+      lines.forEach((line, i) => {
+        line.style.animationDelay = (i * DELAY_MS) + 'ms';
+      });
+    });
+
+    // 2) Toplam süre dolunca splash'i kaldır, ana sayfayı göster
+    window.addEventListener('load', () => {
+      const BOOT_DURATION = 2500; // :root ile eşit tut
+      setTimeout(() => {
+        document.getElementById('app').classList.add('is-ready');
+        const splash = document.querySelector('.splash');
+        if (splash) splash.remove();
+      }, BOOT_DURATION);
+    });
+  </script>
+</body>
+</html>
+
   /* Genel görünüm */
   .splash { color:#fff; }
   .splash-log {
