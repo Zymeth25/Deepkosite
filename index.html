@@ -5,40 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DeepKo Official Page</title>
   <style>
-    :root { --boot-duration: 2500ms; }                /* splash toplam süre: 2.5 sn */
+    :root { --boot-duration: 2500ms; } /* toplam splash süresi */
     html, body { height: 100%; margin: 0; }
     body { background: #000; color: #cfcfcf; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
     /* Tam ekran splash (çerçevesiz) */
-    .splash { position: fixed; inset: 0; background: #000; z-index: 9999; }
+    .splash { position: fixed; inset: 0; background: #000; z-index: 9999; color: #7dff7d; }
 
-    /* Sol üstte, satırlar sırayla belirsin */
+    /* Sol üst log alanı */
     .splash-log {
       position: absolute; top: 20px; left: 20px; right: 20px;
-      max-height: 90vh; overflow: hidden;
-      font-size: 14px; line-height: 1.35; color: #7dff7d;
-      white-space: pre-wrap;
+      max-width: 680px; max-height: 90vh; overflow: hidden;
+      font-size: 14px; line-height: 1.35; white-space: pre-wrap;
     }
-    .log-line {
-      opacity: 0; transform: translateY(6px);
-      animation: showLine 0.25s ease forwards;        /* her satır kısaca beliriyor */
-    }
-    @keyframes showLine { to { opacity: 1; transform: translateY(0); } }
 
-    /* Yanıp sönen blok imleç (opsiyonel) */
+    /* Satır satır görünme (hızlı akış) */
+    .log-line {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 140ms ease, transform 140ms ease;
+      will-change: opacity, transform;
+    }
+    .log-line.show { opacity: 1; transform: translateY(0); }
+
+    /* Yanıp sönen blok imleç */
     .blink { display:inline-block; width:8px; margin-left:4px; animation: blink 900ms steps(1,end) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* Ana içerik splash bitene kadar gizli */
-    .app { opacity:0; visibility:hidden; transition: opacity .3s ease; min-height:100vh; display:grid; place-items:center; }
-    .app.is-ready { opacity:1; visibility:visible; }
+    /* Alttaki yüzde metni */
+    .progress-text {
+      margin-top: 10px;
+      font-size: 15px;
+      color: #9dfb9d;
+      opacity: .95;
+    }
+
+    /* (İstersen çubuk da kullan) */
+    /* .bar { margin-top:6px; height:8px; background:#101010; border:1px solid #2a2a2a; border-radius:999px; overflow:hidden; }
+       .bar > span { display:block; height:100%; width:0%; background: linear-gradient(90deg,#2aff95,#6df7d0); } */
+
+    /* Ana içerik (başta gizli) */
+    .app {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease;
+      min-height: 100vh;
+      display: grid; place-items: center;
+    }
+    .app.is-ready { opacity: 1; visibility: visible; }
   </style>
 </head>
 <body>
 
   <!-- SPLASH -->
   <div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
-    <div class="splash-log">
+    <div class="splash-log" id="log">
+      <!-- LOG SATIRLARI -->
       <div class="log-line">System requirements loading... (Please insert potato to continue)</div>
       <div class="log-line">Loading as it loads... (∞ progress bar vibes)</div>
       <div class="log-line">Almost there... (but not really)</div>
@@ -56,7 +78,13 @@
       <div class="log-line">Her şey 2006’da daha güzeldi xD…</div>
       <div class="log-line">Sistem başlatılıyor…</div>
       <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
-      <div class="log-line">Hazır<span class="blink">█ █ █</span></div>
+      <div class="log-line">Hazır<span class="blink">█</span></div>
+
+      <!-- YÜZDE SAYACI (altta) -->
+      <div class="progress-text" id="pct">0%</div>
+      <!-- İstersen bar'ı aç:
+      <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+      -->
     </div>
   </div>
 
@@ -66,18 +94,34 @@
   </main>
 
   <script>
-    // 1) Satırları sırayla akıt (üstten alta)
-    document.addEventListener('DOMContentLoaded', () => {
-      const lines = document.querySelectorAll('.log-line');
-      const DELAY_MS = 120; // satırlar arası hız (daha hızlı için 90-100 yap)
-      lines.forEach((line, i) => {
-        line.style.animationDelay = (i * DELAY_MS) + 'ms';
-      });
-    });
+    // Ayarlar
+    const BOOT_DURATION = 2500; // ms (yüzde ve kapanış bununla senkron)
+    const LINES_FRACTION = 0.85; // satırlar toplam sürenin %85'inde tamamlansın (kalan %15 "Hazır" + rahat nefes)
 
-    // 2) Toplam süre dolunca splash'i kaldır, ana sayfayı göster
     window.addEventListener('load', () => {
-      const BOOT_DURATION = 2500; // :root ile eşit tut
+      const lines = Array.from(document.querySelectorAll('.log-line'));
+      const pctEl = document.getElementById('pct');
+      // const barEl = document.getElementById('bar'); // bar kullanacaksan yorumdan çıkar
+
+      // Satırları eşit aralıklarla göster (üstten alta akış)
+      const linesTime = Math.max(300, Math.floor(BOOT_DURATION * LINES_FRACTION));
+      const step = Math.max(40, Math.floor(linesTime / Math.max(1, lines.length))); // her satır arası ms
+      lines.forEach((line, i) => {
+        setTimeout(() => line.classList.add('show'), i * step);
+      });
+
+      // Yüzde sayacı: 0 -> 100, BOOT_DURATION boyunca akar
+      const start = performance.now();
+      const end = start + BOOT_DURATION;
+      (function tick(now) {
+        const elapsed = now - start;
+        const pct = Math.min(100, Math.round((elapsed / BOOT_DURATION) * 100));
+        pctEl.textContent = pct + '%';
+        // if (barEl) barEl.style.width = pct + '%'; // bar kullanacaksan
+        if (now < end) requestAnimationFrame(tick);
+      })(start);
+
+      // Süre bitince splash'i kaldır, app'i göster
       setTimeout(() => {
         document.getElementById('app').classList.add('is-ready');
         const splash = document.querySelector('.splash');
@@ -85,117 +129,5 @@
       }, BOOT_DURATION);
     });
   </script>
-</body>
-</html>
-
-  /* Genel görünüm */
-  .splash { color:#fff; }
-  .splash-log {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size:12px;
-    padding:5px 6px;
-    max-width:350px;
-    margin:0;           /* sola yaslı */
-    gap: 0;   
-
-  /* Satırlar arası boşluğu azalt */
-  .log-line {
-  margin-top: 0;
-  margin-bottom: 0;
-  gap: 0 !important;        /* flex gap */
-  row-gap: 0 !important;    /* grid row-gap varsa kapatır */
-  margin: 0;        /* hiçbir dış boşluk yok */
-  padding: 0;       /* iç boşluk yok */
-  line-height: 1;   /* yazı yüksekliği kadar */
-    opacity:0;          /* başta gizli */
-    transform: translateY(2px);
-    transition: opacity 100ms linear, transform 100ms ease-out;
-    white-space: nowrap;    /* tek satır akışı */
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .log-line.show {
-    opacity:1;
-    transform: translateY(0);
-  }
-
-  /* Yanıp sönen kare imleç */
-  .blink {
-    display:inline-block;
-    animation: blink 1s steps(1, end) infinite;
-  }
-  @keyframes blink { 50% { opacity:0; } }
-
-
-  /* Yüzde metni (altta) */
-  .progress-text{
-    font-family:  Consolas;
-    margin-top:20px;
-    font-size:15px;
-    opacity:.9;
-  }
-
-  /* Eğer “bar istemiyorum, sadece yüzde” dersen:
-     .bar { display:none; } satırını aç. */
-  /* .bar { display:none; } */
-</style>
-
-<script>
-  (function(){
-    const lines = Array.from(document.querySelectorAll('.splash .log-line'));
-    const bar    = document.querySelector('.splash .bar span');
-    const pctEl  = document.querySelector('.splash .progress-text');
-
-    // Hız ayarı: her satır arası kaç ms? (daha hızlı/ yavaş için değiştir)
-    const STEP_MS = 350;
-
-    let i = 0;
-    const total = lines.length;
-    function tick(){
-      if(i < total){
-        // Satırı göster
-        lines[i].classList.add('show');
-
-        // İlerleme: satır sayısına bağlı
-        const pct = Math.round(((i+1)/total)*100);
-        if(bar){ bar.style.width = pct + '%'; }
-        if(pctEl){ pctEl.textContent = pct + '%'; }
-
-        i++;
-        setTimeout(tick, STEP_MS);  // hızlıca aşağı insin
-      } else {
-        // Bittiğinde yüzdeyi 100% garantile
-        if(bar){ bar.style.width = '100%'; }
-        if(pctEl){ pctEl.textContent = '100%'; }
-      }
-    }
-    // Başlat
-    tick();
-  })();
-</script>
-
-
-  <!-- ANA SAYFA (yer tutucu) -->
-  <main class="app" id="app">
-    <h1 style="color:#d9d9d9;font-weight:600">DeepKo — Ana Sayfa</h1>
-  </main>
-
- <script>
-  const BOOT_DURATION = 2000; // Splash kaç ms sonra kapansın? (bar ile eşitlemek istersen CSS değişkenini de aynı yap)
-
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const splashEl = document.querySelector('.splash');
-      const appEl = document.getElementById('app');
-
-      // Crossfade'i başlat
-      appEl.classList.add('is-ready');      // app 1 sn’de görünür
-      splashEl.classList.add('is-fading');  // splash 1 sn’de kaybolur
-
-      // 1 sn sonra splash'ı tamamen DOM'dan kaldır
-      setTimeout(() => splashEl.remove(), 1000);
-    }, BOOT_DURATION);
-  });
-</script>
 </body>
 </html>
