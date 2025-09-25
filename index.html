@@ -1,92 +1,60 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DeepKo Official Page</title>
-  <style>
-    :root { --boot-duration: 2500ms; } /* 2 saniye */
-    html, body { height: 100%; margin: 0; }
-    body { background: #000; color: #cfcfcf; font-family:  Consolas; }
-
-    /* Tam ekran splash (çerçevesiz) */
-    .splash {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 9999;
-    }
-    /* Sol üstten akan log alanı */
-    .splash-log {
-      position: absolute;
-      top: 24px; left: 24px; right: 24px;
-      max-height: 90vh; overflow: hidden;
-      font-size: 14px; line-height: 0.3; color: #7dff7d;
-      white-space: pre-wrap;
-    }
-    /* Satır satır görünme efekti */
-    .log-line {
-      opacity: 0;
-      transform: translateY(6px);
-      animation: showLine 0.80s ease forwards;
-    }
-    @keyframes showLine { to { opacity: 1; transform: translateY(0); } }
-
-    /* Yanıp sönen blok imleç */
-    .blink { display: inline-block; width: 8px; margin-left: 4px; animation: blink 900ms steps(1,end) infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    /* Yükleme çubuğu (opsiyonel, 2 sn doluyor) */
-    .bar { margin-top: 10px; height: 8px; background:#101010; border:1px solid #2a2a2a; border-radius:999px; overflow:hidden; }
-    .bar > span { display:block; height:100%; width:0%; background: linear-gradient(90deg,#2aff95,#6df7d0); animation: fill var(--boot-duration) ease forwards; }
-    @keyframes fill { to { width: 100%; } }
-
-    /* Splash kalkınca görünen ana içerik */
-    .app { opacity:0; visibility:hidden; transition: opacity .3s ease; min-height:100vh; display:grid; place-items:center; }
-    .app.is-ready { opacity:1; visibility:visible; }
-  </style>
- /* 1 sn’lik sayfa geçişi (crossfade + hafif zoom) */
-.splash { opacity: 1; transition: opacity 1000ms ease; }
-.splash.is-fading { opacity: 0; pointer-events: none; }
-
-.app {
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(0.985);                 /* çok hafif yakınlaşma hissi */
-  transition: opacity 1000ms ease, transform 1000ms ease;
-}
-.app.is-ready {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-}
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Splash Screen</title>
+<style>
+  body {
+    background: #000;
+    color: #7dff7d;
+    font-family: Consolas, monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .log {
+    position: relative;
+    width: 600px;
+    height: 24px; /* tek satır için */
+    overflow: hidden;
+  }
+  .log-line {
+    position: absolute;
+    opacity: 0;
+    animation: fadeInOut 1s linear forwards;
+  }
+  @keyframes fadeInOut {
+    0%   { opacity: 0; transform: translateY(100%); }
+    10%  { opacity: 1; transform: translateY(0); }
+    90%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-100%); }
+  }
+</style>
 </head>
 <body>
- <!-- SENİN HTML'in -->
-<!-- SPLASH -->
-<div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
-  <div class="splash-log">
-    <div class="log-line">System requirements loading... (Please insert potato to continue)</div>
-    <div class="log-line">Loading as it loads... (∞ progress bar vibes)</div>
-    <div class="log-line">Almost there... (but not really)</div>
-    <div class="log-line">It’s about to be full... (99% forever club)</div>
-    <div class="log-line">We are all part of the show... (No refunds)</div>
-    <div class="log-line">Only stole 2 seconds of your life :S (trust me bro)</div>
-    <div class="log-line">Everything was better in 2006 xD (Bring back MSN Messenger!)</div>
-    <div class="log-line">System is starting... (Cross your fingers)</div>
-    <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬 (Server in vacation mode)</div>
-    <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
-    <div class="log-line">Yüklendikçe yükleniyor</div>
-    <div class="log-line">Ha gayet çok az kaldı...</div>
-    <div class="log-line">Aha doldu dolcak...</div>
-    <div class="log-line">Hepimiz şovun bir parçasıyız...</div>
-    <div class="log-line">Sadece 2 saniyeni aldım :S...</div>
-    <div class="log-line">Herşey 2006 yılında çok güzeldi sanki xD...</div>
-    <div class="log-line">Sistem başlatılıyor...</div>
-    <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
-    <div class="log-line">Hazır<span class="blink">█ █ █</span></div>
-    <div class="progress-text" aria-hidden="true">0%</div>
+  <div class="log">
+    <div class="log-line" style="animation-delay: 0s">System requirements loading... (Please insert potato to continue)</div>
+    <div class="log-line" style="animation-delay: 1s">Loading as it loads... (∞ progress bar vibes)</div>
+    <div class="log-line" style="animation-delay: 2s">Almost there... (but not really)</div>
+    <div class="log-line" style="animation-delay: 3s">It’s about to be full... (99% forever club)</div>
+    <div class="log-line" style="animation-delay: 4s">We are all part of the show... (No refunds)</div>
+    <div class="log-line" style="animation-delay: 5s">Only stole 2 seconds of your life :S (trust me bro)</div>
+    <div class="log-line" style="animation-delay: 6s">Everything was better in 2006 xD (Bring back MSN Messenger!)</div>
+    <div class="log-line" style="animation-delay: 7s">System is starting... (Cross your fingers)</div>
+    <div class="log-line" style="animation-delay: 8s">Knight Online Hayaf Offline 🚬🚬🚬 (Server in vacation mode)</div>
+    <div class="log-line" style="animation-delay: 9s">Sistem gereksinimleri yükleniyor...</div>
+    <div class="log-line" style="animation-delay: 10s">Yüklendikçe yükleniyor</div>
+    <div class="log-line" style="animation-delay: 11s">Ha gayet çok az kaldı...</div>
+    <div class="log-line" style="animation-delay: 12s">Aha doldu dolcak...</div>
+    <div class="log-line" style="animation-delay: 13s">Hepimiz şovun bir parçasıyız...</div>
+    <div class="log-line" style="animation-delay: 14s">Sadece 2 saniyeni aldım :S...</div>
+    <div class="log-line" style="animation-delay: 15s">Herşey 2006 yılında çok güzeldi sanki xD...</div>
+    <div class="log-line" style="animation-delay: 16s">Sistem başlatılıyor...</div>
+    <div class="log-line" style="animation-delay: 17s">Knight Online Hayaf Offline 🚬🚬🚬</div>
+    <div class="log-line" style="animation-delay: 18s">Hazır█ █ █</div>
+    <div class="log-line" style="animation-delay: 19s">11%</div>
   
 <style>
   /* Genel görünüm */
