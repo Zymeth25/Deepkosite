@@ -54,6 +54,9 @@
     <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
     <div class="log-line">Yüklendikçe yükleniyor</div>
     <div class="log-line">Ha gayet çok az kaldı...</div>
+    <div class="log-line">Ha gayet çok az kaldı...</div>
+    <div class="log-line">Ha gayet çok az kaldı...</div>
+      <div class="log-line">Ha gayet çok az kaldı...</div>
     <div class="log-line">Sistem başlatılıyor...</div>
     <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
     <div class="log-line">Hazır<span class="blink">█</span></div>
@@ -72,9 +75,13 @@
 
   /* Satırlar arası boşluğu azalt */
   .log-line {
+  display: flex;            /* dikey diz */
+  flex-direction: column;
+  gap: 0 !important;        /* flex gap */
+  row-gap: 0 !important;    /* grid row-gap varsa kapatır */
   margin: 0;        /* hiçbir dış boşluk yok */
   padding: 0;       /* iç boşluk yok */
-  line-height: 0.3;   /* yazı yüksekliği kadar */
+  line-height: 1;   /* yazı yüksekliği kadar */
     opacity:0;          /* başta gizli */
     transform: translateY(2px);
     transition: opacity 120ms linear, transform 120ms ease-out;
