@@ -112,6 +112,151 @@
     // ======= Ayarlar =======
     const BOOT_DURATION = 2000;        // ms (0→100% ve kapanış bu sürede biter)
     const LINES_FRACTION = 0.85;       // log satırları toplam sürenin %85'inde tamamlansın
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeepKo Official Page</title>
+  <style>
+    :root { --boot-duration: 2500ms; } /* Splash toplam süresi */
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: #000;
+      color: #cfcfcf;
+      font-family: Consolas, "Share Tech Mono", "SFMono-Regular", Menlo, Monaco, 
+               "Noto Sans Mono", "MS Gothic", "Yu Gothic Mono", "Meiryo", monospace;
+  background: black;
+  color: #00ff00; /* Matrix yeşili */
+}
+    }
+
+    /* Splash (tam ekran, çerçevesiz) */
+    .splash {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      color: #7dff7d;
+    }
+
+    /* Sol üstte akan log alanı */
+    .splash-log {
+      position: absolute;
+      top: 20px; left: 20px; right: 20px;
+      max-width: 720px;
+      max-height: 92vh;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 0.3;
+      white-space: pre-wrap;
+    }
+
+    /* Satırlar: başta gizli, sırayla .show alacak */
+    .log-line {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 140ms ease, transform 140ms ease;
+      will-change: opacity, transform;
+      margin: 0; padding: 0;
+    }
+    .log-line.show { opacity: 1; transform: translateY(0); }
+
+    /* Yanıp sönen blok imleç (opsiyonel) */
+    .blink { display:inline-block; width:8px; margin-left:4px; animation: blink 900ms steps(1,end) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Yüzde sayacı (Consolas) */
+    .pct{
+      font-family: Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 15px;
+      color: #9dfb9d;
+      opacity: .95;
+      margin-top: 10px;
+    }
+
+    /* Ana sayfa (başta gizli, sonra görünür) */
+    .app {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+    .app.is-ready { opacity: 1; visibility: visible; }
+  </style>
+</head>
+<body>
+
+  <!-- SPLASH -->
+  <div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
+    <div class="splash-log" id="log">
+      <!-- LOG SATIRLARI (sırayla akacak) -->
+      <div class="log-line">System requirements loading... (Please insert potato to continue)</div>
+      <div class="log-line">Loading as it loads... (∞ progress bar vibes)</div>
+      <div class="log-line">Almost there... (but not really)</div>
+      <div class="log-line">It’s about to be full... (99% forever club)</div>
+      <div class="log-line">We are all part of the show... (No refunds)</div>
+      <div class="log-line">Only stole 2.5 seconds of your life :S (trust me bro)</div>
+      <div class="log-line">Everything was better in 2006 xD (Bring back MSN Messenger!)</div>
+      <div class="log-line">System is starting... (Cross your fingers)</div>
+      <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
+      <div class="log-line">Yüklendikçe yükleniyor…</div>
+      <div class="log-line">Ha gayret, çok az kaldı…</div>
+      <div class="log-line" data-hold="300">Aha doldu dolacak…</div>
+      <div class="log-line" data-hold="300">Hepimiz şovun bir parçasıyız…</div>
+      <div class="log-line">Sadece 2.5 saniyeni aldım :S…</div>
+      <div class="log-line">Her şey 2006’da daha güzeldi xD…</div>
+      <div class="log-line">Sistem başlatılıyor…</div>
+      <div class="log-line" data-hold="200">Knight Online Hayaf Offline 🚬🚬🚬</div>
+      <div class="log-line">Hazır<span class="blink">█ █ █</span></div>
+
+      <!-- YÜZDE SAYACI -->
+      <div id="pct" class="pct">0%</div>
+    </div>
+  </div>
+
+  <!-- ANA SAYFA (yer tutucu) -->
+  <main class="app" id="app">
+    <h1 style="color:#d9d9d9;font-weight:600">DeepKo — Ana Sayfa</h1>
+  </main>
+
+  <script>
+    // ======= Ayarlar =======
+    const BOOT_DURATION = 2000;        // ms (0→100% ve kapanış bu sürede biter)
+    const LINES_FRACTION = 0.85;       // log satırları toplam sürenin %85'inde tamamlansın
+
+    window.addEventListener('load', () => {
+      const lines = Array.from(document.querySelectorAll('.log-line'));
+      const pctEl = document.getElementById('pct');
+      const appEl = document.getElementById('app');
+      const splashEl = document.querySelector('.splash');
+
+      // 1) Satırları sırayla göster (üstten alta akış)
+      const linesTime = Math.max(300, Math.floor(BOOT_DURATION * LINES_FRACTION));
+      const step = Math.max(40, Math.floor(linesTime / Math.max(1, lines.length)));
+      lines.forEach((line, i) => setTimeout(() => line.classList.add('show'), i * step));
+
+      // 2) Yüzde sayacı: 0 -> 100
+      const start = performance.now();
+      const end = start + BOOT_DURATION;
+      (function tick(now){
+        const elapsed = now - start;
+        const pct = Math.min(100, Math.round((elapsed / BOOT_DURATION) * 100));
+        pctEl.textContent = pct + '%';
+        if (now < end) {
+          requestAnimationFrame(tick);
+        } else {
+          // 3) Bittiğinde ana sayfayı aç, splash'i kaldır
+          appEl.classList.add('is-ready');
+          splashEl.remove();
+        }
+      })(start);
+    });
+  </script>
+</body>
+</html>
 
     window.addEventListener('load', () => {
       const lines = Array.from(document.querySelectorAll('.log-line'));
