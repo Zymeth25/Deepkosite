@@ -45,6 +45,22 @@
     .app { opacity:0; visibility:hidden; transition: opacity .3s ease; min-height:100vh; display:grid; place-items:center; }
     .app.is-ready { opacity:1; visibility:visible; }
   </style>
+ /* 1 sn’lik sayfa geçişi (crossfade + hafif zoom) */
+.splash { opacity: 1; transition: opacity 1000ms ease; }
+.splash.is-fading { opacity: 0; pointer-events: none; }
+
+.app {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.985);                 /* çok hafif yakınlaşma hissi */
+  transition: opacity 1000ms ease, transform 1000ms ease;
+}
+.app.is-ready {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
 </head>
 <body>
  <!-- SENİN HTML'in -->
@@ -165,24 +181,22 @@
     <h1 style="color:#d9d9d9;font-weight:600">DeepKo — Ana Sayfa</h1>
   </main>
 
-  <script>
-    const BOOT_DURATION = 2000; // 2 saniye
+ <script>
+  const BOOT_DURATION = 2000; // Splash kaç ms sonra kapansın? (bar ile eşitlemek istersen CSS değişkenini de aynı yap)
 
-    // Satırları sırayla göster (üstten alta akış)
-    document.addEventListener('DOMContentLoaded', () => {
-      const lines = document.querySelectorAll('.log-line');
-      lines.forEach((line, i) => {
-        line.style.animationDelay = (i * 160) + 'ms'; // hız: 160ms * satır indexi
-      });
-    });
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const splashEl = document.querySelector('.splash');
+      const appEl = document.getElementById('app');
 
-    // 2 saniye sonra splash'i kaldır, app'i göster
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('app').classList.add('is-ready');
-        document.querySelector('.splash').remove();
-      }, BOOT_DURATION);
-    });
-  </script>
+      // Crossfade'i başlat
+      appEl.classList.add('is-ready');      // app 1 sn’de görünür
+      splashEl.classList.add('is-fading');  // splash 1 sn’de kaybolur
+
+      // 1 sn sonra splash'ı tamamen DOM'dan kaldır
+      setTimeout(() => splashEl.remove(), 1000);
+    }, BOOT_DURATION);
+  });
+</script>
 </body>
 </html>
