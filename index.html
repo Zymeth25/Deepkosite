@@ -63,10 +63,12 @@
   /* Genel görünüm */
   .splash { color:#fff; }
   .splash-log {
+    display: flex;
+    flex-direction: column;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size:12px;
     padding:5px 6px;
-    max-width:720px;
+    max-width:20px;
     margin:0;           /* sola yaslı */
     gap: 0;   
 
@@ -74,6 +76,7 @@
   .log-line {
     margin: 0;           /* ekstra boşluk yok */
     padding: 0;
+    gap: 0;   
     line-height:1.4;    /* sıkı satır aralığı */
     opacity:0;          /* başta gizli */
     transform: translateY(2px);
