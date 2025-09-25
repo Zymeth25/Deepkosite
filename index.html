@@ -123,11 +123,7 @@
       const linesTime = Math.max(300, Math.floor(BOOT_DURATION * LINES_FRACTION));
       const step = Math.max(40, Math.floor(linesTime / Math.max(1, lines.length)));
       lines.forEach((line, i) => setTimeout(() => line.classList.add('show'), i * step));
-       for (const line of lines) {
-      setTimeout(() => line.classList.add('show'), t);
-      const hold = parseInt(line.dataset.hold || '0', 10) || 0;
-      t += STEP_MS + hold;
-    }
+     
       // 2) Yüzde sayacı: 0 -> 100
       const start = performance.now();
       const end = start + BOOT_DURATION;
