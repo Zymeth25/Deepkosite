@@ -47,19 +47,130 @@
   </style>
 </head>
 <body>
-  <!-- SPLASH -->
-  <div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
-    <div class="splash-log">
-      <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
-      <div class="log-line">Yüklendikçe yükleniyor</div>
-      <div class="log-line">Ha gayet çok az kaldı...</div>
-      <div class="log-line">Hazırsanız başlıyoruz? :)</div>
-      <div class="log-line">Sistem başlatılıyor...</div>
-      <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
-      <div class="log-line">Ready<span class="blink">█</span></div>
-      <div class="bar" aria-hidden="true"><span></span></div>
-    </div>
+ <!-- SENİN HTML'in -->
+<!-- SPLASH -->
+<div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
+  <div class="splash-log">
+    <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
+    <div class="log-line">Yüklendikçe yükleniyor</div>
+    <div class="log-line">Ha gayet çok az kaldı...</div>
+    <div class="log-line">Hazırsanız başlıyoruz? :)</div>
+    <div class="log-line">Sistem başlatılıyor...</div>
+    <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
+    <div class="log-line">Hazır<span class="blink">█</span></div>
+
+    <!-- Eski bar iskeletin (kullanacağız): -->
+    <div class="bar" aria-hidden="true"><span></span></div>
+
+    <!-- ALTA YÜZDE METNİ -->
+    <div class="progress-text" aria-hidden="true">0%</div>
   </div>
+</div>
+
+<style>
+  /* Genel görünüm */
+  .splash { color:#fff; }
+  .splash-log {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:14px;
+    padding:12px 16px;
+    max-width:720px;
+    margin:0;           /* sola yaslı */
+  }
+
+  /* Satırlar arası boşluğu azalt */
+  .log-line {
+    margin:0;           /* ekstra boşluk yok */
+    line-height:1.2;    /* sıkı satır aralığı */
+    opacity:0;          /* başta gizli */
+    transform: translateY(2px);
+    transition: opacity 120ms linear, transform 120ms ease-out;
+    white-space: nowrap;    /* tek satır akışı */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .log-line.show {
+    opacity:1;
+    transform: translateY(0);
+  }
+
+  /* Yanıp sönen kare imleç */
+  .blink {
+    display:inline-block;
+    animation: blink 1s steps(1, end) infinite;
+  }
+  @keyframes blink { 50% { opacity:0; } }
+
+  /* Aşağıdaki bar: segmentli (eski Windows) görünüm + hızlı dolum */
+  .bar {
+    height:8px;
+    margin-top:8px;      /* cümle mesafesi kadar */
+    border-radius:2px;
+    background:#0c2136;  /* arka iz */
+    overflow:hidden;
+    position:relative;
+  }
+  .bar span{
+    display:block;
+    height:100%;
+    width:0%;
+    /* Segmentli şerit görüntüsü */
+    background:
+      repeating-linear-gradient(
+        90deg,
+        #39a0ff 0 12px,
+        #39a0ff 12px 14px,
+        #0c2136 14px 16px
+      );
+    transition: width 160ms linear; /* her adımda hızlı ilerlesin */
+  }
+
+  /* Yüzde metni (altta) */
+  .progress-text{
+    margin-top:6px;
+    font-size:12px;
+    opacity:.9;
+  }
+
+  /* Eğer “bar istemiyorum, sadece yüzde” dersen:
+     .bar { display:none; } satırını aç. */
+  /* .bar { display:none; } */
+</style>
+
+<script>
+  (function(){
+    const lines = Array.from(document.querySelectorAll('.splash .log-line'));
+    const bar    = document.querySelector('.splash .bar span');
+    const pctEl  = document.querySelector('.splash .progress-text');
+
+    // Hız ayarı: her satır arası kaç ms? (daha hızlı/ yavaş için değiştir)
+    const STEP_MS = 350;
+
+    let i = 0;
+    const total = lines.length;
+    function tick(){
+      if(i < total){
+        // Satırı göster
+        lines[i].classList.add('show');
+
+        // İlerleme: satır sayısına bağlı
+        const pct = Math.round(((i+1)/total)*100);
+        if(bar){ bar.style.width = pct + '%'; }
+        if(pctEl){ pctEl.textContent = pct + '%'; }
+
+        i++;
+        setTimeout(tick, STEP_MS);  // hızlıca aşağı insin
+      } else {
+        // Bittiğinde yüzdeyi 100% garantile
+        if(bar){ bar.style.width = '100%'; }
+        if(pctEl){ pctEl.textContent = '100%'; }
+      }
+    }
+    // Başlat
+    tick();
+  })();
+</script>
+
 
   <!-- ANA SAYFA (yer tutucu) -->
   <main class="app" id="app">
