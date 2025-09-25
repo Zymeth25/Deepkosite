@@ -122,7 +122,12 @@
       // 1) Satırları sırayla göster (üstten alta akış)
       const linesTime = Math.max(300, Math.floor(BOOT_DURATION * LINES_FRACTION));
       const step = Math.max(40, Math.floor(linesTime / Math.max(1, lines.length)));
-      lines.forEach((line, i) => setTimeout(() => line.classList.add('show'), i * step));
+      let extraHold = 0;
+lines.forEach((line, i) => {
+  setTimeout(() => line.classList.add('show'), i * step + extraHold);
+  const hold = parseInt(line.dataset.hold || '0', 10) || 0; // data-hold varsa ekle
+  extraHold += hold;
+});
      
       // 2) Yüzde sayacı: 0 -> 100
       const start = performance.now();
