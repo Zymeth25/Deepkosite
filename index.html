@@ -58,15 +58,8 @@
     <div class="log-line">Sistem başlatılıyor...</div>
     <div class="log-line">Knight Online Hayaf Offline 🚬🚬🚬</div>
     <div class="log-line">Hazır<span class="blink">█</span></div>
-
-    <!-- Eski bar iskeletin (kullanacağız): -->
-    <div class="bar" aria-hidden="true"><span></span></div>
-
-    <!-- ALTA YÜZDE METNİ -->
     <div class="progress-text" aria-hidden="true">0%</div>
-  </div>
-</div>
-
+  
 <style>
   /* Genel görünüm */
   .splash { color:#fff; }
@@ -81,7 +74,7 @@
   /* Satırlar arası boşluğu azalt */
   .log-line {
     margin:0;           /* ekstra boşluk yok */
-    line-height:1.2;    /* sıkı satır aralığı */
+    line-height:0.2;    /* sıkı satır aralığı */
     opacity:0;          /* başta gizli */
     transform: translateY(2px);
     transition: opacity 120ms linear, transform 120ms ease-out;
