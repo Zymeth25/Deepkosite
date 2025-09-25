@@ -3,246 +3,86 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DeepKo Offical Page</title>
-  <!-- Açılış ekranı ve temel stil -->
+  <title>DeepKo Official Page</title>
   <style>
-    /* Genel reset ve gövde zemin */
     :root { --boot-duration: 2000ms; } /* 2 saniye */
     html, body { height: 100%; margin: 0; }
-    body { background: #000; color: #e0e0e0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    body { background: #000; color: #cfcfcf; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    /* SPLASH (açılış) katmanı: tüm ekranı kaplar */
+    /* Tam ekran splash (çerçevesiz) */
     .splash {
       position: fixed;
       inset: 0;
-      background: #001;            /* siyah zemin */
-      display: grid;
-      place-items: center;
+      background: #000;
       z-index: 9999;
-      transition: opacity 300ms ease;
     }
-    /* içerik kutusu */
-    .splash-box {
-      width: min(90vw, 520px);
-      border: 1px solid #3f3f3f;
-      background: #0a0a0a;
-      box-shadow: 0 0 0 2px #111 inset, 0 12px 40px rgba(0,0,0,.7);
-      padding: 18px 16px 14px;
-      border-radius: 6px;
-    }
-    .splash-title { 
-      color: #b4f5b4;              /* retro yeşil */
-      margin: 0 0 8px 0; 
-      font-weight: 700; 
-      letter-spacing: .3px;
-      display: flex; 
-      align-items: center; 
-      gap: 8px;
-    }
-    .splash-title::before {
-      content: "■";
-      color: #7fff7f;
-      font-size: 14px;
-    }
+    /* Sol üstten akan log alanı */
     .splash-log {
-      font-size: 13px;
-      line-height: 1.45;
-      color: #cfcfcf;
-      background: #050505;
-      border: 1px solid #212121;
-      border-radius: 4px;
-      padding: 10px 12px;
-      max-height: 38vh;
-      overflow: hidden;
-      position: relative;
+      position: absolute;
+      top: 24px; left: 24px; right: 24px;
+      max-height: 90vh; overflow: hidden;
+      font-size: 14px; line-height: 1.45; color: #7dff7d;
+      white-space: pre-wrap;
     }
-    /* “yazı akıyormuş” efekti için yumuşak yanıp sönme */
-    .blink {
-      display: inline-block;
-      width: 8px;
-      margin-left: 4px;
-      animation: blink 900ms steps(1, end) infinite;
+    /* Satır satır görünme efekti */
+    .log-line {
+      opacity: 0;
+      transform: translateY(6px);
+      animation: showLine 0.35s ease forwards;
     }
+    @keyframes showLine { to { opacity: 1; transform: translateY(0); } }
+
+    /* Yanıp sönen blok imleç */
+    .blink { display: inline-block; width: 8px; margin-left: 4px; animation: blink 900ms steps(1,end) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* Yükleme çubuğu */
-    .bar {
-      margin-top: 10px;
-      height: 8px;
-      background: #101010;
-      border: 1px solid #2a2a2a;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .bar > span {
-      display: block;
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #2aff95, #6df7d0);
-      animation: fill var(--boot-duration) ease forwards;
-    }
+    /* Yükleme çubuğu (opsiyonel, 2 sn doluyor) */
+    .bar { margin-top: 10px; height: 8px; background:#101010; border:1px solid #2a2a2a; border-radius:999px; overflow:hidden; }
+    .bar > span { display:block; height:100%; width:0%; background: linear-gradient(90deg,#2aff95,#6df7d0); animation: fill var(--boot-duration) ease forwards; }
     @keyframes fill { to { width: 100%; } }
 
-    /* SPLASH gizlenirken */
-    .splash.is-hidden { opacity: 0; pointer-events: none; }
-
-    /* Ana içerik başlangıçta görünmez (splash kalkınca açılır) */
-    .app {
-      min-height: 100%;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 300ms ease;
-    }
-    .app.is-ready { opacity: 1; visibility: visible; }
-
-    /* Hareketi azalt tercihi olanlar için animasyonları kıs */
-    @media (prefers-reduced-motion: reduce) {
-      .splash, .app { transition: none; }
-      .bar > span { animation-duration: 500ms; }
-      :root { --boot-duration: 500ms; }
-    }
-
-    /* Küçük bir başlangıç sayfası stili (yer tutucu) */
-    .desktop {
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
-      background: radial-gradient(1200px 600px at 50% -10%, #0f0f0f, #000);
-    }
-    .window {
-      width: min(92vw, 860px);
-      border: 1px solid #3f3f3f;
-      background: #0a0a0a;
-      border-radius: 8px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.6);
-      overflow: hidden;
-    }
-    .titlebar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 12px; background: #111; border-bottom: 1px solid #222;
-    }
-    .btn { width: 12px; height: 12px; border-radius: 999px; }
-    .btn.red { background: #ff5f56; } .btn.yellow { background: #ffbd2e; } .btn.green { background: #27c93f; }
-    .content { padding: 18px; color: #d9d9d9; line-height: 1.55; }
-    a { color: #7ae1ff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    /* Splash kalkınca görünen ana içerik */
+    .app { opacity:0; visibility:hidden; transition: opacity .3s ease; min-height:100vh; display:grid; place-items:center; }
+    .app.is-ready { opacity:1; visibility:visible; }
   </style>
 </head>
 <body>
-  <!-- Açılış ekranı (2 sn) -->
+  <!-- SPLASH -->
   <div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
-    <div class="splash-box">
-      <h1 class="splash-title">Welcome To DeepKo Offical Knight Online Pvp Server</h1>
-        <div class="splash-log">
-  <div class="log-line">Initializing kernel modules…</div>
-  <div class="log-line">Loading assets: ui, fonts, retro-widgets…</div>
-  <div class="log-line">Mounting /panel … ready</div>
-  <div class="log-line">Network: link-up</div>
-  <div class="log-line">Starting services: auth, session, db…</div>
-  <div class="log-line">Ready █</div>
-</div>.splash-log {
-  font-size: 14px;
-  line-height: 1.4;
-  font-family: monospace;
-  color: #0f0;           /* retro yeşil */
-  margin: 20px;
-}
-
-.log-line {
-  opacity: 0;            /* başlangıçta görünmez */
-  transform: translateY(5px);
-  animation: showLine 0.4s ease forwards;
-}
-
-@keyframes showLine {
-  to { opacity: 1; transform: translateY(0); }
-}
-      <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const lines = document.querySelectorAll(".log-line");
-    lines.forEach((line, i) => {
-      // her satırı sırayla 200ms arayla göster
-      line.style.animationDelay = (i * 0.2) + "s";
-    });
-  });
-</script>
-
-      
-
-        <div>Initializing kernel modules…</div>
-        <div>Loading assets: ui, fonts, retro-widgets…</div>
-        <div>Mounting /panel … ready</div>
-        <div>Network: <span id="net">link-up</span></div>
-        <div>Starting services: auth, session, db…</div>
-        <div>Ready<span class="blink">█</span></div>
-        <div class="bar" aria-hidden="true"><span></span></div>
-      </div>
+    <div class="splash-log">
+      <div class="log-line">Initializing kernel modules…</div>
+      <div class="log-line">Loading assets: ui, fonts, retro-widgets…</div>
+      <div class="log-line">Mounting /panel … ready</div>
+      <div class="log-line">Network: link-up</div>
+      <div class="log-line">Starting services: auth, session, db…</div>
+      <div class="log-line">Ready<span class="blink">█</span></div>
+      <div class="bar" aria-hidden="true"><span></span></div>
     </div>
   </div>
 
-  <!-- JS kapalıysa kullanıcı boş sayfa görmesin diye basit bir uyarı -->
-  <noscript>
-    <div style="padding:12px;background:#111;color:#eee;border-bottom:1px solid #333;">
-      Bu sayfa doğru çalışması için JavaScript gerektirir. Lütfen tarayıcınızda JS’i etkinleştirin.
-    </div>
-  </noscript>
-
-  <!-- Ana uygulama (splash bitince açılacak) -->
+  <!-- ANA SAYFA (yer tutucu) -->
   <main class="app" id="app">
-    <div class="desktop">
-      <div class="window">
-        <div class="titlebar">
-          <div class="btn red"></div><div class="btn yellow"></div><div class="btn green"></div>
-          <span style="margin-left:8px;color:#bdbdbd">Knight PVP Control Panel</span>
-        </div>
-        <div class="content">
-          <h2 style="margin-top:0">Ana Ekran</h2>
-          <p>Windows93 tarzı temayı birlikte aşama aşama inşa edeceğiz. Buraya “Client”, “Kayıt”, “Sıralama”, “Forum”, “Discord” gibi bağlantıları ekleriz.</p>
-          <p><a href="#">▶ Örnek link</a></p>
-        </div>
-      </div>
-    </div>
+    <h1 style="color:#d9d9d9;font-weight:600">DeepKo — Ana Sayfa</h1>
   </main>
 
-  <!-- Açılış ekranı mantığı -->
   <script>
-    // Açılış süresi (ms) — tasarım gereği 2 saniye:
-    const BOOT_DURATION = 2000; // süreyi değiştirmek için burayı düzenle
+    const BOOT_DURATION = 2000; // 2 saniye
 
-    const splash = document.querySelector('.splash');
-    const app = document.getElementById('app');
-
-    // Sayfa ve kaynaklar yüklenince (görsellik açısından) başlat:
-    // Eğer resim/asset yoksa DOMContentLoaded da yeter; ama ileride ikonlar eklersek load daha iyi görünür.
-    window.addEventListener('load', () => {
-      const startedAt = performance.now();
-
-      // En az BOOT_DURATION kadar splash’ı göster; load çok hızlı ise kalan süreyi beklet
-      const ensureMinTime = () => {
-        const elapsed = performance.now() - startedAt;
-        const remaining = Math.max(0, BOOT_DURATION - elapsed);
-        setTimeout(hideSplash, remaining);
-      };
-
-      function hideSplash() {
-        // Splash’ı yumuşakça gizle, uygulamayı göster
-        splash.classList.add('is-hidden');
-        app.classList.add('is-ready');
-        // Erişilebilirlik için splash’ı tamamen DOM’dan kaldırmak istersen:
-        setTimeout(() => splash.remove(), 350);
-      }
-
-      ensureMinTime();
+    // Satırları sırayla göster (üstten alta akış)
+    document.addEventListener('DOMContentLoaded', () => {
+      const lines = document.querySelectorAll('.log-line');
+      lines.forEach((line, i) => {
+        line.style.animationDelay = (i * 160) + 'ms'; // hız: 160ms * satır indexi
+      });
     });
 
-    // Güvenlik ağı: load tetiklenmezse en geç BOOT_DURATION sonunda yine de göster
-    setTimeout(() => {
-      if (!document.querySelector('.app.is-ready')) {
-        splash.classList.add('is-hidden');
+    // 2 saniye sonra splash'i kaldır, app'i göster
+    window.addEventListener('load', () => {
+      setTimeout(() => {
         document.getElementById('app').classList.add('is-ready');
-        setTimeout(() => splash.remove(), 350);
-      }
-    }, BOOT_DURATION + 800);
+        document.querySelector('.splash').remove();
+      }, BOOT_DURATION);
+    });
   </script>
 </body>
 </html>
