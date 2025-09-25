@@ -140,7 +140,34 @@
   <div class="log-line">Network: link-up</div>
   <div class="log-line">Starting services: auth, session, db…</div>
   <div class="log-line">Ready █</div>
-</div>
+</div>.splash-log {
+  font-size: 14px;
+  line-height: 1.4;
+  font-family: monospace;
+  color: #0f0;           /* retro yeşil */
+  margin: 20px;
+}
+
+.log-line {
+  opacity: 0;            /* başlangıçta görünmez */
+  transform: translateY(5px);
+  animation: showLine 0.4s ease forwards;
+}
+
+@keyframes showLine {
+  to { opacity: 1; transform: translateY(0); }
+}
+      <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const lines = document.querySelectorAll(".log-line");
+    lines.forEach((line, i) => {
+      // her satırı sırayla 200ms arayla göster
+      line.style.animationDelay = (i * 0.2) + "s";
+    });
+  });
+</script>
+
+      
 
         <div>Initializing kernel modules…</div>
         <div>Loading assets: ui, fonts, retro-widgets…</div>
