@@ -73,8 +73,8 @@
 
   /* Satırlar arası boşluğu azalt */
   .log-line {
-    margin:0;           /* ekstra boşluk yok */
-    line-height:0.2;    /* sıkı satır aralığı */
+    margin:3;           /* ekstra boşluk yok */
+    line-height:1.4;    /* sıkı satır aralığı */
     opacity:0;          /* başta gizli */
     transform: translateY(2px);
     transition: opacity 120ms linear, transform 120ms ease-out;
@@ -94,29 +94,6 @@
   }
   @keyframes blink { 50% { opacity:0; } }
 
-  /* Aşağıdaki bar: segmentli (eski Windows) görünüm + hızlı dolum */
-  .bar {
-    height:8px;
-    margin-top:8px;      /* cümle mesafesi kadar */
-    border-radius:2px;
-    background:#0c2136;  /* arka iz */
-    overflow:hidden;
-    position:relative;
-  }
-  .bar span{
-    display:block;
-    height:100%;
-    width:0%;
-    /* Segmentli şerit görüntüsü */
-    background:
-      repeating-linear-gradient(
-        90deg,
-        #39a0ff 0 12px,
-        #39a0ff 12px 14px,
-        #0c2136 14px 16px
-      );
-    transition: width 160ms linear; /* her adımda hızlı ilerlesin */
-  }
 
   /* Yüzde metni (altta) */
   .progress-text{
