@@ -51,6 +51,7 @@
 <!-- SPLASH -->
 <div class="splash" role="status" aria-live="polite" aria-label="Açılış ekranı">
   <div class="splash-log">
+    
     <div class="log-line">Sistem gereksinimleri yükleniyor...</div>
     <div class="log-line">Yüklendikçe yükleniyor</div>
     <div class="log-line">Ha gayet çok az kaldı...</div>
@@ -75,8 +76,8 @@
 
   /* Satırlar arası boşluğu azalt */
   .log-line {
-  display: flex;            /* dikey diz */
-  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 0;
   gap: 0 !important;        /* flex gap */
   row-gap: 0 !important;    /* grid row-gap varsa kapatır */
   margin: 0;        /* hiçbir dış boşluk yok */
