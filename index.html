@@ -137,7 +137,7 @@ lines.forEach((line, i) => {
       const end = start + BOOT_DURATION;
       (function tick(now){
         const elapsed = now - start;
-        const pct = Math.min(100, Math.round((elapsed / BOOT_DURATION) * 100));
+        const pct = Math.min(90, Math.round((elapsed / BOOT_DURATION) * 90));
         pctEl.textContent = pct + '%';
         if (now < end) {
           requestAnimationFrame(tick);
